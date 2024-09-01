@@ -1,0 +1,198 @@
+swagger: "2.0"
+info:
+  description: "API для работы с событиями и пользователями"
+  version: "1.0.0"
+  title: "Events API"
+
+host: "api.example.com"
+basePath: "/v1"
+
+schemes:
+  - "https"
+  - "http"
+
+paths:
+  /events/value/{value}:
+    get:
+      summary: "Получить типы событий по значению"
+      description: "Возвращает список типов событий с указанным значением"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "value"
+          in: "path"
+          description: "Значение для фильтрации типов событий"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Успешный ответ"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+              types:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    Types:
+                      type: "string"
+                    Value:
+                      type: "integer"
+              error:
+                type: "string"
+
+  /events/day/{day}:
+    get:
+      summary: "Получить события за день"
+      description: "Возвращает список событий, произошедших в указанный день"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "day"
+          in: "path"
+          description: "Дата в формате YYYY-MM-DD"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Успешный ответ"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+              events:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    event_id:
+                      type: "integer"
+                    event_type:
+                      type: "string"
+                    user_id:
+                      type: "integer"
+                    event_time:
+                      type: "string"
+                      format: "date-time"
+                    payload:
+                      type: "string"
+              error:
+                type: "string"
+
+  /user/{value}:
+    get:
+      summary: "Получить пользователей по значению"
+      description: "Возвращает список пользователей по значению событий"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "value"
+          in: "path"
+          description: "Значение для фильтрации пользователей"
+          required: true
+          type: "integer"
+      responses:
+        200:
+          description: "Успешный ответ"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+              users_ids:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    User:
+                      type: "integer"
+                    Value:
+                      type: "integer"
+              error:
+                type: "string"
+
+  /event:
+    get:
+      summary: "Получить события по типу и дате"
+      description: "Возвращает список событий по указанному типу и дате"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "type"
+          in: "query"
+          description: "Тип события"
+          required: true
+          type: "string"
+        - name: "date"
+          in: "query"
+          description: "Дата в формате YYYY-MM-DD"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Успешный ответ"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+              events:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    event_id:
+                      type: "integer"
+                    event_type:
+                      type: "string"
+                    user_id:
+                      type: "integer"
+                    event_time:
+                      type: "string"
+                      format: "date-time"
+                    payload:
+                      type: "string"
+              error:
+                type: "string"
+
+  /event/new:
+    post:
+      summary: "Создать новое событие"
+      description: "Добавляет новое событие в базу данных"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "body"
+          in: "body"
+          description: "Данные нового события"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              event_id:
+                type: "integer"
+              event_type:
+                type: "string"
+              user_id:
+                type: "integer"
+              event_time:
+                type: "string"
+                format: "date-time"
+              payload:
+                type: "string"
+      responses:
+        200:
+          description: "Успешный ответ"
+          schema:
+            type: "object"
+            properties:
+              success:
+                type: "boolean"
+              error:
+                type: "string"
