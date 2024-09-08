@@ -1,0 +1,18 @@
+	я решил, что стоит сделать систему более гибкой и добавить возможность сдлеть более точные запросы, также добавил
+	возможность получать эти данные по api исходные запросы для решения поставленных задач:
+1)
+	SELECT eventType, COUNT(*) AS event_count
+	FROM events
+	GROUP BY eventType
+	HAVING event_count > 1000;
+2)
+	SELECT eventID, eventType, userID, eventTime, payload
+	FROM events
+	WHERE toStartOfMonth(eventTime) = toDate(eventTime)
+3)
+	SELECT userID, COUNT(DISTINCT eventType) AS unique_event_types
+	FROM events
+	GROUP BY userID
+	HAVING unique_event_types > 3;
+
+Для запуска нужно создать облачную бд clickhouse на https://clickhouse.cloud/, затем вписать креды бд в config

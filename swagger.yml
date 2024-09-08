@@ -4,7 +4,6 @@ info:
   version: "1.0.0"
   title: "Events API"
 
-host: "api.example.com"
 basePath: "/v1"
 
 schemes:
@@ -16,6 +15,7 @@ paths:
     get:
       summary: "Получить типы событий по значению"
       description: "Возвращает список типов событий с указанным значением"
+      operationId: "GetEventByValue"
       produces:
         - "application/json"
       parameters:
@@ -28,26 +28,17 @@ paths:
         200:
           description: "Успешный ответ"
           schema:
-            type: "object"
-            properties:
-              success:
-                type: "boolean"
-              types:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    Types:
-                      type: "string"
-                    Value:
-                      type: "integer"
-              error:
-                type: "string"
+            $ref: "#/definitions/GetEventByValueResponse"
+        500:
+          description: "Ошибка сервера"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /events/day/{day}:
     get:
       summary: "Получить события за день"
       description: "Возвращает список событий, произошедших в указанный день"
+      operationId: GetEventByDay
       produces:
         - "application/json"
       parameters:
@@ -60,33 +51,17 @@ paths:
         200:
           description: "Успешный ответ"
           schema:
-            type: "object"
-            properties:
-              success:
-                type: "boolean"
-              events:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    event_id:
-                      type: "integer"
-                    event_type:
-                      type: "string"
-                    user_id:
-                      type: "integer"
-                    event_time:
-                      type: "string"
-                      format: "date-time"
-                    payload:
-                      type: "string"
-              error:
-                type: "string"
+            $ref: "#/definitions/GetEventByDayResponse"
+        500:
+          description: "Ошибка сервера"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /user/{value}:
     get:
       summary: "Получить пользователей по значению"
       description: "Возвращает список пользователей по значению событий"
+      operationId: GetUserByValue
       produces:
         - "application/json"
       parameters:
@@ -99,26 +74,17 @@ paths:
         200:
           description: "Успешный ответ"
           schema:
-            type: "object"
-            properties:
-              success:
-                type: "boolean"
-              users_ids:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    User:
-                      type: "integer"
-                    Value:
-                      type: "integer"
-              error:
-                type: "string"
+            $ref: "#/definitions/GetUserByValueResponse"
+        500:
+          description: "Ошибка сервера"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /event:
     get:
       summary: "Получить события по типу и дате"
       description: "Возвращает список событий по указанному типу и дате"
+      operationId: GetEvent
       produces:
         - "application/json"
       parameters:
@@ -136,33 +102,17 @@ paths:
         200:
           description: "Успешный ответ"
           schema:
-            type: "object"
-            properties:
-              success:
-                type: "boolean"
-              events:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    event_id:
-                      type: "integer"
-                    event_type:
-                      type: "string"
-                    user_id:
-                      type: "integer"
-                    event_time:
-                      type: "string"
-                      format: "date-time"
-                    payload:
-                      type: "string"
-              error:
-                type: "string"
+            $ref: "#/definitions/GetEventResponse"
+        500:
+          description: "Ошибка сервера"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
   /event/new:
     post:
       summary: "Создать новое событие"
       description: "Добавляет новое событие в базу данных"
+      operationId: NewEvent
       consumes:
         - "application/json"
       produces:
@@ -173,26 +123,128 @@ paths:
           description: "Данные нового события"
           required: true
           schema:
-            type: "object"
-            properties:
-              event_id:
-                type: "integer"
-              event_type:
-                type: "string"
-              user_id:
-                type: "integer"
-              event_time:
-                type: "string"
-                format: "date-time"
-              payload:
-                type: "string"
+            $ref: "#/definitions/NewEventRequest"
       responses:
         200:
           description: "Успешный ответ"
           schema:
-            type: "object"
-            properties:
-              success:
-                type: "boolean"
-              error:
-                type: "string"
+            $ref: "#/definitions/NewEventResponse"
+        400:
+          description: "Плохой запрос"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        500:
+          description: "Ошибка сервера"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+definitions:
+  EventType:
+    type: "object"
+    properties:
+      Types:
+        type: "string"
+      Value:
+        type: "integer"
+
+  EventDetail:
+    type: "object"
+    properties:
+      event_id:
+        type: "integer"
+      event_type:
+        type: "string"
+      user_id:
+        type: "integer"
+      event_time:
+        type: "string"
+        format: "date-time"
+      payload:
+        type: "string"
+
+  UserDetail:
+    type: "object"
+    properties:
+      User:
+        type: "integer"
+      Value:
+        type: "integer"
+
+  GetEventByValueResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      types:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventType"
+      error:
+        type: "string"
+
+  GetEventByDayResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      events:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventDetail"
+      error:
+        type: "string"
+
+  GetUserByValueResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      users_ids:
+        type: "array"
+        items:
+          $ref: "#/definitions/UserDetail"
+      error:
+        type: "string"
+
+  GetEventResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      events:
+        type: "array"
+        items:
+          $ref: "#/definitions/EventDetail"
+      error:
+        type: "string"
+
+  NewEventRequest:
+    type: "object"
+    properties:
+      event_id:
+        type: "integer"
+      event_type:
+        type: "string"
+      user_id:
+        type: "integer"
+      event_time:
+        type: "string"
+        format: "date-time"
+      payload:
+        type: "string"
+
+  NewEventResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      error:
+        type: "string"
+
+  ErrorResponse:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      error:
+        type: "string"

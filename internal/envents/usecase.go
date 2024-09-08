@@ -1,10 +1,16 @@
 package envents
 
-type UseCase interface {
-	GetEventTypesByEventValue(value string) ([]EventTypesValueResponse, error)
-	GetEventByDay(day string) ([]Event, error)
-	GetUserByUniqueEventTypesValue(value string) ([]UserByTypesValueResponse, error)
-	GetEventByTypeAndDate(date string, eventType EventType) ([]Event, error)
+import (
+	"test_task_stat4market/models"
+)
 
-	NewEvent(event Event) error
+//интерфейс UseCase
+
+type UseCase interface {
+	GetEventTypesByEventValue(value int) ([]*models.EventType, error)
+	GetEventByDay(day string) ([]*models.EventDetail, error)
+	GetUserByUniqueEventTypesValue(value int) ([]*models.UserDetail, error)
+	GetEventByTypeAndDate(date string, eventType string) ([]*models.EventDetail, error)
+
+	NewEvent(event models.NewEventRequest) error
 }

@@ -1,12 +1,17 @@
 package envents
 
-import "time"
+import (
+	"test_task_stat4market/models"
+	"time"
+)
+
+//интерфейс репозитория
 
 type Repository interface {
-	GetEventTypesByEventValueRepo(value int) ([]EventTypesValueResponse, error)
-	GetEventByDayRepo(dayStart time.Time, dayEnd time.Time) ([]Event, error)
-	GetUserByUniqueEventTypesValueRepo(value int) ([]UserByTypesValueResponse, error)
-	GetEventByTypeAndDateRepo(dayStart EventTime, dayEnd EventTime, eventType EventType) ([]Event, error)
+	GetEventTypesByEventValueRepo(value int) ([]*models.EventType, error)
+	GetEventByDayRepo(dayStart time.Time, dayEnd time.Time) ([]*models.EventDetail, error)
+	GetUserByUniqueEventTypesValueRepo(value int) ([]*models.UserDetail, error)
+	GetEventByTypeAndDateRepo(dayStart time.Time, dayEnd time.Time, eventType string) ([]*models.EventDetail, error)
 
-	NewEventRepo(event Event) error
+	NewEventRepo(event models.NewEventRequest) error
 }

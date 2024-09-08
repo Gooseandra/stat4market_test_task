@@ -6,7 +6,7 @@ package mocks
 
 import (
 	reflect "reflect"
-	envents "test_task_stat4market/internal/envents"
+	models "test_task_stat4market/models"
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,10 +36,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // GetEventByDayRepo mocks base method.
-func (m *MockRepository) GetEventByDayRepo(dayStart, dayEnd time.Time) ([]envents.Event, error) {
+func (m *MockRepository) GetEventByDayRepo(dayStart, dayEnd time.Time) ([]*models.EventDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventByDayRepo", dayStart, dayEnd)
-	ret0, _ := ret[0].([]envents.Event)
+	ret0, _ := ret[0].([]*models.EventDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -51,10 +51,10 @@ func (mr *MockRepositoryMockRecorder) GetEventByDayRepo(dayStart, dayEnd interfa
 }
 
 // GetEventByTypeAndDateRepo mocks base method.
-func (m *MockRepository) GetEventByTypeAndDateRepo(dayStart, dayEnd envents.EventTime, eventType envents.EventType) ([]envents.Event, error) {
+func (m *MockRepository) GetEventByTypeAndDateRepo(dayStart, dayEnd time.Time, eventType string) ([]*models.EventDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventByTypeAndDateRepo", dayStart, dayEnd, eventType)
-	ret0, _ := ret[0].([]envents.Event)
+	ret0, _ := ret[0].([]*models.EventDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,10 +66,10 @@ func (mr *MockRepositoryMockRecorder) GetEventByTypeAndDateRepo(dayStart, dayEnd
 }
 
 // GetEventTypesByEventValueRepo mocks base method.
-func (m *MockRepository) GetEventTypesByEventValueRepo(value int) ([]envents.EventTypesValueResponse, error) {
+func (m *MockRepository) GetEventTypesByEventValueRepo(value int) ([]*models.EventType, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventTypesByEventValueRepo", value)
-	ret0, _ := ret[0].([]envents.EventTypesValueResponse)
+	ret0, _ := ret[0].([]*models.EventType)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockRepositoryMockRecorder) GetEventTypesByEventValueRepo(value interf
 }
 
 // GetUserByUniqueEventTypesValueRepo mocks base method.
-func (m *MockRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]envents.UserByTypesValueResponse, error) {
+func (m *MockRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]*models.UserDetail, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByUniqueEventTypesValueRepo", value)
-	ret0, _ := ret[0].([]envents.UserByTypesValueResponse)
+	ret0, _ := ret[0].([]*models.UserDetail)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,7 +96,7 @@ func (mr *MockRepositoryMockRecorder) GetUserByUniqueEventTypesValueRepo(value i
 }
 
 // NewEventRepo mocks base method.
-func (m *MockRepository) NewEventRepo(event envents.Event) error {
+func (m *MockRepository) NewEventRepo(event models.NewEventRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NewEventRepo", event)
 	ret0, _ := ret[0].(error)

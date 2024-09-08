@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"test_task_stat4market/internal/envents"
+	"test_task_stat4market/models"
 	"time"
 )
 
@@ -16,24 +17,7 @@ func NewClickHouseRepository(db *sql.DB) envents.Repository {
 	}
 }
 
-//	я решил, что стоит сделать систему более гибкой и добавить возможность сдлеть более точные запросы, также добавил
-//	возможность получать эти данные по api исходные запросы для решения поставленных задач:
-//1)
-//	SELECT eventType, COUNT(*) AS event_count
-//	FROM events
-//	GROUP BY eventType
-//	HAVING event_count > 1000;
-//2)
-//	SELECT eventID, eventType, userID, eventTime, payload
-//	FROM events
-//	WHERE toStartOfMonth(eventTime) = toDate(eventTime)
-//3)
-//	SELECT userID, COUNT(DISTINCT eventType) AS unique_event_types
-//	FROM events
-//	GROUP BY userID
-//	HAVING unique_event_types > 3;
-
-func (r EventsRepository) GetEventTypesByEventValueRepo(value int) ([]envents.EventTypesValueResponse, error) {
+func (r EventsRepository) GetEventTypesByEventValueRepo(value int) ([]*models.EventType, error) {
 	query := `SELECT eventType, COUNT(*) AS event_count
 		FROM events GROUP BY eventType
         HAVING event_count > $1`
@@ -41,19 +25,26 @@ func (r EventsRepository) GetEventTypesByEventValueRepo(value int) ([]envents.Ev
 	if err != nil {
 		return nil, err
 	}
-	var temp envents.EventTypesValueResponse
-	var result []envents.EventTypesValueResponse
+	defer rows.Close() // Закрываем rows после завершения работы с ним
+
+	var result []*models.EventType
 	for rows.Next() {
+		temp := &models.EventType{} // Создаем новый экземпляр EventType для каждой строки
 		err = rows.Scan(&temp.Types, &temp.Value)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, temp)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 
-func (r EventsRepository) GetEventByDayRepo(dayStart time.Time, dayEnd time.Time) ([]envents.Event, error) {
+func (r EventsRepository) GetEventByDayRepo(dayStart time.Time, dayEnd time.Time) ([]*models.EventDetail, error) {
 	query := `SELECT eventID, eventType, userID, eventTime, payload
         FROM events
         WHERE eventTime >= $1 AND eventTime < $2`
@@ -61,19 +52,24 @@ func (r EventsRepository) GetEventByDayRepo(dayStart time.Time, dayEnd time.Time
 	if err != nil {
 		return nil, err
 	}
-	var temp envents.Event
-	var result []envents.Event
+	defer rows.Close() // Закрываем rows, чтобы освободить ресурсы
+
+	var result []*models.EventDetail
 	for rows.Next() {
+		temp := new(models.EventDetail) // Инициализируем temp
 		err = rows.Scan(&temp.EventID, &temp.EventType, &temp.UserID, &temp.EventTime, &temp.Payload)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, temp)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return result, nil
 }
 
-func (r EventsRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]envents.UserByTypesValueResponse, error) {
+func (r EventsRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]*models.UserDetail, error) {
 	query := `SELECT userID, COUNT(DISTINCT eventType) AS unique_event_types
         FROM events
         GROUP BY userID
@@ -82,19 +78,50 @@ func (r EventsRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]enven
 	if err != nil {
 		return nil, err
 	}
-	var temp envents.UserByTypesValueResponse
-	var result []envents.UserByTypesValueResponse
+	defer rows.Close() // Закрываем rows, чтобы освободить ресурсы
+
+	var result []*models.UserDetail
 	for rows.Next() {
+		temp := new(models.UserDetail) // Инициализируем temp
 		err = rows.Scan(&temp.User, &temp.Value)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, temp)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 	return result, nil
 }
 
-func (r EventsRepository) NewEventRepo(event envents.Event) error {
+func (r EventsRepository) GetEventByTypeAndDateRepo(dayStart time.Time, dayEnd time.Time, eventType string) ([]*models.EventDetail, error) {
+	query := `SELECT eventID, eventType, userID, eventTime, payload
+    FROM events
+    WHERE eventTime >= $1 AND eventTime < $2
+      AND eventType = $3`
+	rows, err := r.db.Query(query, dayStart, dayEnd, eventType)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close() // Закрываем rows, чтобы освободить ресурсы
+
+	var result []*models.EventDetail
+	for rows.Next() {
+		temp := new(models.EventDetail) // Инициализируем temp
+		err = rows.Scan(&temp.EventID, &temp.EventType, &temp.UserID, &temp.EventTime, &temp.Payload)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, temp)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r EventsRepository) NewEventRepo(event models.NewEventRequest) error {
 	query := `INSERT INTO events(eventID, eventType, userID, eventTime, payload)
 		VALUES ($1,$2,$3,$4,$5)`
 	_, err := r.db.Exec(query,
@@ -107,26 +134,4 @@ func (r EventsRepository) NewEventRepo(event envents.Event) error {
 		return err
 	}
 	return nil
-}
-
-func (r EventsRepository) GetEventByTypeAndDateRepo(dayStart envents.EventTime, dayEnd envents.EventTime,
-	eventType envents.EventType) ([]envents.Event, error) {
-	query := `SELECT eventID, eventType, userID, eventTime, payload
-    FROM events
-    WHERE eventTime >= $1 AND eventTime < $2
-      AND eventType = $3`
-	rows, err := r.db.Query(query, dayStart, dayEnd, eventType)
-	if err != nil {
-		return nil, err
-	}
-	var temp envents.Event
-	var result []envents.Event
-	for rows.Next() {
-		err = rows.Scan(&temp.EventID, &temp.EventType, &temp.UserID, &temp.EventTime, &temp.Payload)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, temp)
-	}
-	return result, nil
 }

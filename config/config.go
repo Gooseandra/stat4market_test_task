@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -12,17 +13,34 @@ type Config struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
 	} `yaml:"service"`
+	Db struct {
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		Host     string `yaml:"host"`
+	}
 }
 
 func LoadConfig() (*viper.Viper, error) {
 	v := viper.New()
-	v.AddConfigPath(os.Getenv("CONFIG_PATH"))
-	v.SetConfigName(os.Getenv("CONFIG_NAME"))
+
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "./config"
+	}
+	configName := os.Getenv("CONFIG_NAME")
+	if configName == "" {
+		configName = "config"
+	}
+
+	v.AddConfigPath(configPath)
+	v.SetConfigName(configName)
 	v.SetConfigType("yml")
+
 	err := v.ReadInConfig()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading config file: %s", err)
 	}
+
 	return v, nil
 }
 
