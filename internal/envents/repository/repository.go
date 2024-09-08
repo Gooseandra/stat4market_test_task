@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"test_task_stat4market/internal/envents"
-	"test_task_stat4market/models"
+	"test_task_stat4market/internal/generated/models"
 	"time"
 )
 
@@ -53,7 +53,6 @@ func (r EventsRepository) GetEventByDayRepo(dayStart time.Time, dayEnd time.Time
 		return nil, err
 	}
 	defer rows.Close() // Закрываем rows, чтобы освободить ресурсы
-
 	var result []*models.EventDetail
 	for rows.Next() {
 		temp := new(models.EventDetail) // Инициализируем temp
@@ -82,7 +81,7 @@ func (r EventsRepository) GetUserByUniqueEventTypesValueRepo(value int) ([]*mode
 
 	var result []*models.UserDetail
 	for rows.Next() {
-		temp := new(models.UserDetail) // Инициализируем temp
+		temp := &models.UserDetail{} // Инициализируем temp для записи строки
 		err = rows.Scan(&temp.User, &temp.Value)
 		if err != nil {
 			return nil, err
@@ -108,7 +107,7 @@ func (r EventsRepository) GetEventByTypeAndDateRepo(dayStart time.Time, dayEnd t
 
 	var result []*models.EventDetail
 	for rows.Next() {
-		temp := new(models.EventDetail) // Инициализируем temp
+		temp := &models.EventDetail{} // Инициализируем temp
 		err = rows.Scan(&temp.EventID, &temp.EventType, &temp.UserID, &temp.EventTime, &temp.Payload)
 		if err != nil {
 			return nil, err
@@ -123,7 +122,7 @@ func (r EventsRepository) GetEventByTypeAndDateRepo(dayStart time.Time, dayEnd t
 
 func (r EventsRepository) NewEventRepo(event models.NewEventRequest) error {
 	query := `INSERT INTO events(eventID, eventType, userID, eventTime, payload)
-		VALUES ($1,$2,$3,$4,$5)`
+		VALUES ($1,$2,$3,$4,$5)` // тут, надеюсь, комментарии излишни
 	_, err := r.db.Exec(query,
 		event.EventID,
 		event.EventType,

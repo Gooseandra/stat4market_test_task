@@ -2,11 +2,12 @@ package delivery
 
 import (
 	"errors"
-	"github.com/go-openapi/runtime/middleware"
 	"log"
 	"test_task_stat4market/internal/envents"
-	"test_task_stat4market/models"
-	"test_task_stat4market/restapi/operations"
+	"test_task_stat4market/internal/generated/models"
+	"test_task_stat4market/internal/generated/restapi/operations"
+
+	"github.com/go-openapi/runtime/middleware"
 )
 
 type (

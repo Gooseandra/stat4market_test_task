@@ -2,17 +2,18 @@ package main
 
 import (
 	"crypto/tls"
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/go-openapi/loads"
-	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"test_task_stat4market/config"
 	"test_task_stat4market/internal/envents/delivery"
 	"test_task_stat4market/internal/envents/repository"
 	"test_task_stat4market/internal/envents/usecase"
-	"test_task_stat4market/restapi"
-	"test_task_stat4market/restapi/operations"
+	"test_task_stat4market/internal/generated/restapi"
+	"test_task_stat4market/internal/generated/restapi/operations"
+
+	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/go-openapi/loads"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -37,6 +38,7 @@ func main() {
 		},
 	})
 
+	// Проверка подключения к бд
 	row := conn.QueryRow("SELECT 1")
 	var col uint8
 	if err := row.Scan(&col); err != nil {
@@ -68,6 +70,7 @@ func main() {
 	server.ConfigureFlags()
 	server.ConfigureAPI()
 
+	// Настройка cors
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -77,7 +80,7 @@ func main() {
 
 	serverPort := cfg.Service.Port
 	serverAddress := cfg.Service.Host
-	log.Printf("Serving mchs at http://%s\n", serverAddress+serverPort)
+	log.Printf("Serving at http://%s\n", serverAddress+serverPort)
 	if err := http.ListenAndServe(serverAddress+serverPort, corsHandler); err != nil {
 		log.Fatalln(err)
 	}

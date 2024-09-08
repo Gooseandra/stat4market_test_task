@@ -1,7 +1,7 @@
 package envents
 
 import (
-	"test_task_stat4market/models"
+	"test_task_stat4market/internal/generated/models"
 	"time"
 )
 

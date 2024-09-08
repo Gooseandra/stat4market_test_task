@@ -1,13 +1,14 @@
 package usecase
 
 import (
+	"test_task_stat4market/internal/generated/mocks"
+	"test_task_stat4market/internal/generated/models"
+	"testing"
+	"time"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"test_task_stat4market/internal/mocks"
-	"test_task_stat4market/models"
-	"testing"
-	"time"
 )
 
 func TestGetEventTypesByEventValue(t *testing.T) {

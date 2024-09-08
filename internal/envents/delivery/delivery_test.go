@@ -2,14 +2,15 @@ package delivery
 
 import (
 	"errors"
+	"test_task_stat4market/internal/generated/mocks"
+	"test_task_stat4market/internal/generated/models"
+	"test_task_stat4market/internal/generated/restapi/operations"
+	"testing"
+	"time"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"test_task_stat4market/internal/mocks"
-	"test_task_stat4market/models"
-	"test_task_stat4market/restapi/operations"
-	"testing"
-	"time"
 )
 
 func TestGetEventByValue_Handle_Success(t *testing.T) {
